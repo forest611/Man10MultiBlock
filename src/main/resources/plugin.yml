@@ -1,0 +1,6 @@
+name: Man10MultiBlock
+version: 1.0
+softdepend:
+  - Man10CommonLibs
+main: man10multiblock.man10multiblock.Man10MultiBlock
+api-version: 1.15
