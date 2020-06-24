@@ -28,9 +28,6 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         logger.info("Y:${location.blockY}")
         logger.info("Z:${location.blockZ}")
 
-//        location.subtract(location).block.type = Material.BARRIER
-
-//        val centerLocation = Location(location.world,location.x,(location.x+1)/2,location.z)
 
         val cube = getCube(size,location)
 
@@ -50,10 +47,28 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
     fun setArmorStand(location: Location,item:ItemStack){
 
-        val armor = location.world.spawn(location,ArmorStand :: class.java)
+        val loc = location.clone()
+
+        var yaw: Float = loc.yaw
+        if (yaw < 0) {
+            yaw += 360f
+        }
+        if (yaw >= 315 || yaw < 45) {
+            loc.yaw = 0.0F
+        } else if (yaw < 135) {
+            loc.yaw = 90F
+        } else if (yaw < 225) {
+            loc.yaw = 180F
+        } else if (yaw < 315) {
+            loc.yaw = -90F
+        }
+        loc.x+=0.5
+        loc.z+=0.5
+
+        val armor = location.world.spawn(loc,ArmorStand :: class.java)
         armor.setGravity(false)
         armor.canPickupItems = false
-        armor.isVisible = false
+//        armor.isVisible = false
         armor.setItem(EquipmentSlot.HEAD,item)
         logger.info("X:${location.blockX}")
         logger.info("Y:${location.blockY}")
@@ -83,8 +98,8 @@ class Man10MultiBlock : JavaPlugin(),Listener{
     }
 
     fun setMultiBlock(size: Int,location: Location,item:ItemStack){
+        if(!setBarrier(size,location))return
         setArmorStand(location,item)
-        setBarrier(size,location)
     }
 
     @EventHandler
@@ -107,7 +122,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         loc.y += 1.0
         loc.yaw = e.player.location.yaw
 
-        setMultiBlock(5,loc,e.player.inventory.itemInMainHand)
+        setMultiBlock(3,loc,e.player.inventory.itemInMainHand)
 
     }
 
