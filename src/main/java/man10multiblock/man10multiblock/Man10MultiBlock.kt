@@ -1,16 +1,23 @@
 package man10multiblock.man10multiblock
 
-import org.bukkit.Location
-import org.bukkit.Material
+import org.bukkit.*
+import org.bukkit.command.Command
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
+import java.lang.StringBuilder
 
 class Man10MultiBlock : JavaPlugin(),Listener{
     override fun onEnable() {
@@ -50,6 +57,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         val loc = location.clone()
 
         var yaw: Float = loc.yaw
+
         if (yaw < 0) {
             yaw += 360f
         }
@@ -62,13 +70,14 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         } else if (yaw < 315) {
             loc.yaw = -90F
         }
+
         loc.x+=0.5
         loc.z+=0.5
 
         val armor = location.world.spawn(loc,ArmorStand :: class.java)
         armor.setGravity(false)
         armor.canPickupItems = false
-//        armor.isVisible = false
+        armor.isVisible = false
         armor.setItem(EquipmentSlot.HEAD,item)
         logger.info("X:${location.blockX}")
         logger.info("Y:${location.blockY}")
@@ -102,21 +111,57 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         setArmorStand(location,item)
     }
 
-    @EventHandler
-    fun setBlock(e:BlockPlaceEvent){
+    fun getMultiBlockCommand(loc:Location):String{
 
-        e.isCancelled = true
+        val stand = getArmorStand(loc)?:return "none"
 
-        setBarrier(5,e.block.location)
+        val head = stand.getItem(EquipmentSlot.HEAD)
+        if (!head.hasItemMeta())return "none"
+        val meta = head.itemMeta!!
+
+        return meta.persistentDataContainer[NamespacedKey(this,"command"), PersistentDataType.STRING]?:"none"
+    }
+
+    fun getArmorStand(loc:Location): ArmorStand? {
+        val entities = loc.world.getNearbyEntities(loc,1.5,1.5,1.5)
+
+        for (entity in entities){
+            if (entity.type !=EntityType.ARMOR_STAND)continue
+            if (entity !is ArmorStand)continue
+
+            return entity
+        }
+
+        return null
 
     }
 
-    @EventHandler
-    fun setItem(e:PlayerInteractEvent){
+    fun removeMachine(loc:Location):ItemStack?{
+
+        val stand = getArmorStand(loc)?:return null
+
+        val block = stand.location.block.location
+
+        val cube = getCube(3,block)
+
+        cube.forEach{c -> c.block.type = Material.AIR}
+
+        val item = stand.getItem(EquipmentSlot.HEAD).clone()
+
+        stand.remove()
+        return item
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    fun clickEvent(e:PlayerInteractEvent){
 
         if (e.action != Action.RIGHT_CLICK_BLOCK)return
 
-        if (!e.hasItem())return
+        val item  = e.item?:return
+
+        if (!item.hasItemMeta())return
+
+        item.itemMeta.persistentDataContainer[NamespacedKey(this,"command"), PersistentDataType.STRING]?:return
 
         val loc = e.clickedBlock!!.location
         loc.y += 1.0
@@ -124,6 +169,73 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         setMultiBlock(3,loc,e.player.inventory.itemInMainHand)
 
+        return
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    fun clickBarrier(e:PlayerInteractEvent){
+
+        if (e.action != Action.RIGHT_CLICK_BLOCK)return
+
+        val block = e.clickedBlock?:return
+
+        if (block.type != Material.BARRIER)return
+
+        val cmd = getMultiBlockCommand(block.location)
+
+        if (cmd == "none")return
+
+        val p = e.player
+
+        if (!p.isOp){
+            p.isOp = true
+            p.performCommand(cmd)
+            p.isOp = false
+        }else{
+            p.performCommand(cmd)
+        }
+
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    fun breakBlock(e:PlayerInteractEvent){
+        if (e.action != Action.LEFT_CLICK_BLOCK)return
+
+        val item = removeMachine(e.clickedBlock!!.location)?:return
+
+        e.player.inventory.addItem(item)
+    }
+
+
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
+
+        if (sender !is Player)return true
+
+        if (!sender.hasPermission("man10multiblock.op"))return true
+
+        val item = sender.inventory.itemInMainHand
+
+        if (item.type == Material.AIR){
+            sender.sendMessage("§c§lアイテムを持ってください！")
+            return true
+        }
+
+        if (args.isEmpty()){
+            sender.sendMessage("§c§lコマンドを設定してください！")
+            return true
+        }
+
+        val cmd = StringBuilder()
+        for (a in args){
+            cmd.append(" $a")
+        }
+
+        val meta = item.itemMeta
+        meta.persistentDataContainer.set(NamespacedKey(this,"command"), PersistentDataType.STRING,cmd.toString())
+
+        item.itemMeta = meta
+
+        return false
     }
 
 }

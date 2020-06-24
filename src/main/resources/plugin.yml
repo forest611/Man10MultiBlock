@@ -4,3 +4,6 @@ softdepend:
   - Man10CommonLibs
 main: man10multiblock.man10multiblock.Man10MultiBlock
 api-version: 1.15
+commands:
+  createmachine:
+    default: op
