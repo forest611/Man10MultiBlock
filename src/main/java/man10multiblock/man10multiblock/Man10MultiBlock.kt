@@ -20,8 +20,15 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.lang.StringBuilder
 
 class Man10MultiBlock : JavaPlugin(),Listener{
+
+    var enableWorld = mutableListOf<String>()
+
     override fun onEnable() {
         // Plugin startup logic
+        saveDefaultConfig()
+
+        enableWorld = config.getStringList("world")
+
         server.pluginManager.registerEvents(this,this)
     }
 
@@ -152,8 +159,10 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         return item
     }
 
-    @EventHandler(priority = EventPriority.LOW)
-    fun clickEvent(e:PlayerInteractEvent){
+    @EventHandler(priority = EventPriority.LOWEST)
+    fun setBarrier(e:PlayerInteractEvent){
+
+        if (!enableWorld.contains(e.player.location.world.name))return
 
         if (e.action != Action.RIGHT_CLICK_BLOCK)return
 
@@ -234,6 +243,8 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         meta.persistentDataContainer.set(NamespacedKey(this,"command"), PersistentDataType.STRING,cmd.toString())
 
         item.itemMeta = meta
+
+        sender.sendMessage("§a§l設定完了！")
 
         return false
     }
