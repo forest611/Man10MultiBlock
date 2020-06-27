@@ -43,23 +43,15 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
     fun setBarrier(size:Int,location: Location):Boolean{
 
-        logger.info("X:${location.blockX}")
-        logger.info("Y:${location.blockY}")
-        logger.info("Z:${location.blockZ}")
-
-
         val cube = getCube(size,location)
 
         for (loc in cube){
             if (loc.block.type != Material.AIR){
-                logger.info("cant filled!!")
                 return false
             }
         }
 
         cube.forEach{ loc -> loc.block.type = Material.BARRIER }
-
-        logger.info("Filled")
 
         return true
     }
@@ -91,9 +83,6 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         armor.canPickupItems = false
         armor.isVisible = false
         armor.setItem(EquipmentSlot.HEAD,item)
-        logger.info("X:${location.blockX}")
-        logger.info("Y:${location.blockY}")
-        logger.info("Z:${location.blockZ}")
 
 
     }
@@ -185,7 +174,9 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         if (!realEstateAPI.hasPermission(e.player,loc,User.Companion.Permission.BLOCK)){ return }
 
-        setMultiBlock(3,loc,e.player.inventory.itemInMainHand)
+        setMultiBlock(3,loc,item)
+
+        e.player.inventory.removeItem(item)
 
         return
     }
@@ -205,6 +196,8 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         if (cmd == "none")return
 
+        if (!realEstateAPI.hasPermission(e.player,block.location,User.Companion.Permission.INVENTORY)){ return }
+
         val p = e.player
 
         if (!p.isOp){
@@ -215,7 +208,6 @@ class Man10MultiBlock : JavaPlugin(),Listener{
             p.performCommand(cmd)
         }
 
-        logger.info(cmd)
 
     }
 
@@ -223,7 +215,11 @@ class Man10MultiBlock : JavaPlugin(),Listener{
     fun breakBlock(e:PlayerInteractEvent){
         if (e.action != Action.LEFT_CLICK_BLOCK)return
 
+        if (e.clickedBlock!!.type != Material.BARRIER)return
+
         val item = removeMachine(e.clickedBlock!!.location)?:return
+
+        if (!realEstateAPI.hasPermission(e.player,e.clickedBlock!!.location,User.Companion.Permission.BLOCK)){ return }
 
         e.player.inventory.addItem(item)
     }
