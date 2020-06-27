@@ -17,17 +17,22 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
+import red.man10.realestate.RealEstateAPI
+import red.man10.realestate.region.User
 import java.lang.StringBuilder
 
 class Man10MultiBlock : JavaPlugin(),Listener{
 
     var enableWorld = mutableListOf<String>()
 
+    lateinit var realEstateAPI:RealEstateAPI
+
     override fun onEnable() {
         // Plugin startup logic
         saveDefaultConfig()
 
         enableWorld = config.getStringList("world")
+        realEstateAPI = RealEstateAPI()
 
         server.pluginManager.registerEvents(this,this)
     }
@@ -164,6 +169,8 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         if (!enableWorld.contains(e.player.location.world.name))return
 
+        if(e.hand != EquipmentSlot.HAND)return
+
         if (e.action != Action.RIGHT_CLICK_BLOCK)return
 
         val item  = e.item?:return
@@ -176,6 +183,8 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         loc.y += 1.0
         loc.yaw = e.player.location.yaw
 
+        if (realEstateAPI.hasPermission(e.player,loc,User.Companion.Permission.BLOCK)){ return }
+
         setMultiBlock(3,loc,e.player.inventory.itemInMainHand)
 
         return
@@ -185,6 +194,8 @@ class Man10MultiBlock : JavaPlugin(),Listener{
     fun clickBarrier(e:PlayerInteractEvent){
 
         if (e.action != Action.RIGHT_CLICK_BLOCK)return
+
+        if(e.hand != EquipmentSlot.HAND)return
 
         val block = e.clickedBlock?:return
 
