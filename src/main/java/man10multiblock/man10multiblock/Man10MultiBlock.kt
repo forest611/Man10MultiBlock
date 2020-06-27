@@ -217,9 +217,9 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         if (e.clickedBlock!!.type != Material.BARRIER)return
 
-        val item = removeMachine(e.clickedBlock!!.location)?:return
-
         if (!realEstateAPI.hasPermission(e.player,e.clickedBlock!!.location,User.Companion.Permission.BLOCK)){ return }
+
+        val item = removeMachine(e.clickedBlock!!.location)?:return
 
         e.player.inventory.addItem(item)
     }
