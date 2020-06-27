@@ -183,7 +183,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         loc.y += 1.0
         loc.yaw = e.player.location.yaw
 
-        if (realEstateAPI.hasPermission(e.player,loc,User.Companion.Permission.BLOCK)){ return }
+        if (!realEstateAPI.hasPermission(e.player,loc,User.Companion.Permission.BLOCK)){ return }
 
         setMultiBlock(3,loc,e.player.inventory.itemInMainHand)
 
@@ -214,6 +214,8 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         }else{
             p.performCommand(cmd)
         }
+
+        logger.info(cmd)
 
     }
 
@@ -247,6 +249,10 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         val cmd = StringBuilder()
         for (a in args){
+            if (cmd.isEmpty()){
+                cmd.append(a)
+                continue
+            }
             cmd.append(" $a")
         }
 
