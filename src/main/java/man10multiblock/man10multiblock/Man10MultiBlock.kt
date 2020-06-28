@@ -17,7 +17,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
-import red.man10.realestate.RealEstateAPI
+//import red.man10.realestate.RealEstateAPI
 import red.man10.realestate.region.User
 import java.lang.StringBuilder
 
@@ -25,14 +25,14 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
     var enableWorld = mutableListOf<String>()
 
-    lateinit var realEstateAPI:RealEstateAPI
+//    lateinit var realEstateAPI:RealEstateAPI
 
     override fun onEnable() {
         // Plugin startup logic
         saveDefaultConfig()
 
         enableWorld = config.getStringList("world")
-        realEstateAPI = RealEstateAPI()
+//        realEstateAPI = RealEstateAPI()
 
         server.pluginManager.registerEvents(this,this)
     }
@@ -172,7 +172,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         loc.y += 1.0
         loc.yaw = e.player.location.yaw
 
-        if (!realEstateAPI.hasPermission(e.player,loc,User.Companion.Permission.BLOCK)){ return }
+//        if (!realEstateAPI.hasPermission(e.player,loc,User.Companion.Permission.BLOCK)){ return }
 
         setMultiBlock(3,loc,item)
 
@@ -196,7 +196,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         if (cmd == "none")return
 
-        if (!realEstateAPI.hasPermission(e.player,block.location,User.Companion.Permission.INVENTORY)){ return }
+//        if (!realEstateAPI.hasPermission(e.player,block.location,User.Companion.Permission.INVENTORY)){ return }
 
         val p = e.player
 
@@ -217,7 +217,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         if (e.clickedBlock!!.type != Material.BARRIER)return
 
-        if (!realEstateAPI.hasPermission(e.player,e.clickedBlock!!.location,User.Companion.Permission.BLOCK)){ return }
+//        if (!realEstateAPI.hasPermission(e.player,e.clickedBlock!!.location,User.Companion.Permission.BLOCK)){ return }
 
         val item = removeMachine(e.clickedBlock!!.location)?:return
 
