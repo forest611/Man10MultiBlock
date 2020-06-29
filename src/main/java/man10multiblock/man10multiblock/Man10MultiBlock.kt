@@ -107,9 +107,10 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
     }
 
-    fun setMultiBlock(size: Int,location: Location,item:ItemStack){
-        if(!setBarrier(size,location))return
+    fun setMultiBlock(size: Int,location: Location,item:ItemStack):Boolean{
+        if(!setBarrier(size,location))return false
         setArmorStand(location,item)
+        return true
     }
 
     fun getMultiBlockCommand(loc:Location):String{
@@ -162,7 +163,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         if (e.action != Action.RIGHT_CLICK_BLOCK)return
 
-        val item  = e.item?:return
+        val item  = e.item?.clone()?:return
 
         if (!item.hasItemMeta())return
 
@@ -174,9 +175,16 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         if (!realEstateAPI.hasPermission(e.player,loc,User.Companion.Permission.BLOCK)){ return }
 
-        setMultiBlock(3,loc,item)
+        e.isCancelled = true
 
-        e.player.inventory.removeItem(item)
+        item.amount = 1
+
+        if (!setMultiBlock(3,loc,item)){
+            e.player.sendMessage("§c§l場所がなくて設置できませんでした！")
+            return
+        }
+
+        e.item!!.amount --
 
         return
     }
