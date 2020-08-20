@@ -19,6 +19,7 @@ import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
 import red.man10.realestate.RealEstateAPI
 import red.man10.realestate.region.User
+
 import java.lang.StringBuilder
 
 class Man10MultiBlock : JavaPlugin(),Listener{
@@ -150,6 +151,8 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         val item = stand.getItem(EquipmentSlot.HEAD).clone()
 
+        item.itemMeta.persistentDataContainer[NamespacedKey(this,"command"), PersistentDataType.STRING]?:return null
+
         stand.remove()
         return item
     }
@@ -173,7 +176,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         loc.y += 1.0
         loc.yaw = e.player.location.yaw
 
-        if (!realEstateAPI.hasPermission(e.player,loc,User.Companion.Permission.BLOCK)){ return }
+        if (!realEstateAPI.hasPermission(e.player,loc, User.Companion.Permission.BLOCK)){ return }
 
         e.isCancelled = true
 
@@ -215,7 +218,6 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         }else{
             p.performCommand(cmd)
         }
-
 
     }
 

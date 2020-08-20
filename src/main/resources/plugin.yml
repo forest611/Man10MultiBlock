@@ -2,6 +2,7 @@ name: Man10MultiBlock
 version: 1.0
 softdepend:
   - Man10CommonLibs
+  - Man10RealEstate
 main: man10multiblock.man10multiblock.Man10MultiBlock
 api-version: 1.15
 commands:
