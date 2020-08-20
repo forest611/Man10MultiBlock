@@ -109,20 +109,13 @@ class Man10MultiBlock : JavaPlugin(),Listener{
     }
 
     fun setMultiBlock(size: Int,location: Location,item:ItemStack):Boolean{
+
+        item.amount = 1
+
         if(!setBarrier(size,location))return false
+
         setArmorStand(location,item)
         return true
-    }
-
-    fun getMultiBlockCommand(loc:Location):String{
-
-        val stand = getArmorStand(loc)?:return "none"
-
-        val head = stand.getItem(EquipmentSlot.HEAD)
-        if (!head.hasItemMeta())return "none"
-        val meta = head.itemMeta!!
-
-        return meta.persistentDataContainer[NamespacedKey(this,"command"), PersistentDataType.STRING]?:"none"
     }
 
     fun getArmorStand(loc:Location): ArmorStand? {
@@ -136,7 +129,33 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         }
 
         return null
+    }
 
+    fun isMachine(item:ItemStack):Boolean{
+        if (item.itemMeta.persistentDataContainer[NamespacedKey(this,"machine"), PersistentDataType.STRING] != null)return true
+
+        return false
+    }
+
+    fun setMachine(item: ItemStack,name:String):ItemStack{
+
+        val meta = item.itemMeta
+
+        meta.persistentDataContainer.set(NamespacedKey(this,"machine"), PersistentDataType.STRING,name)
+
+        item.itemMeta = meta
+        return item
+    }
+
+    fun getMachine(loc:Location):String{
+
+        val stand = getArmorStand(loc)?:return "none"
+
+        val head = stand.getItem(EquipmentSlot.HEAD)
+        if (!head.hasItemMeta())return "none"
+        val meta = head.itemMeta!!
+
+        return meta.persistentDataContainer[NamespacedKey(this,"command"), PersistentDataType.STRING]?:"none"
     }
 
     fun removeMachine(loc:Location):ItemStack?{
@@ -170,7 +189,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         if (!item.hasItemMeta())return
 
-        item.itemMeta.persistentDataContainer[NamespacedKey(this,"command"), PersistentDataType.STRING]?:return
+        if (!isMachine(item))return
 
         val loc = e.clickedBlock!!.location
         loc.y += 1.0
@@ -180,12 +199,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         e.isCancelled = true
 
-        item.amount = 1
-
-        if (!setMultiBlock(3,loc,item)){
-            e.player.sendMessage("§c§l場所がなくて設置できませんでした！")
-            return
-        }
+        if (!setMultiBlock(3,loc,item)){ return }
 
         e.item!!.amount --
 
@@ -203,7 +217,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         if (block.type != Material.BARRIER)return
 
-        val cmd = getMultiBlockCommand(block.location)
+        val cmd = getMachine(block.location)
 
         if (cmd == "none")return
 
@@ -211,13 +225,6 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         val p = e.player
 
-        if (!p.isOp){
-            p.isOp = true
-            p.performCommand(cmd)
-            p.isOp = false
-        }else{
-            p.performCommand(cmd)
-        }
 
     }
 
@@ -249,27 +256,16 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         }
 
         if (args.isEmpty()){
-            sender.sendMessage("§c§lコマンドを設定してください！")
+            sender.sendMessage("§c§lマシンを設定してください！")
             return true
         }
 
-        val cmd = StringBuilder()
-        for (a in args){
-            if (cmd.isEmpty()){
-                cmd.append(a)
-                continue
-            }
-            cmd.append(" $a")
-        }
-
-        val meta = item.itemMeta
-        meta.persistentDataContainer.set(NamespacedKey(this,"command"), PersistentDataType.STRING,cmd.toString())
-
-        item.itemMeta = meta
+        setMachine(item,args[0])
 
         sender.sendMessage("§a§l設定完了！")
 
-        return false
+        return true
+
     }
 
 }
