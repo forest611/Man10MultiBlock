@@ -6,5 +6,5 @@ softdepend:
 main: man10multiblock.man10multiblock.Man10MultiBlock
 api-version: 1.15
 commands:
-  createmachine:
+  multiblock:
     default: op
