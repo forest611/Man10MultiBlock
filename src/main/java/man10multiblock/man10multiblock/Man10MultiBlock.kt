@@ -190,10 +190,6 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         val block = stand.location.block.location
 
-        val cube = getCube(3,block)
-
-        cube.forEach{c -> c.block.type = Material.AIR}
-
         val item = stand.getItem(EquipmentSlot.HEAD).clone()
 
         if (recipe.isCraft(item)){
@@ -201,6 +197,10 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         }
 
         if (!isMachine(item))return null
+
+        val cube = getCube(3,block)
+
+        cube.forEach{c -> c.block.type = Material.AIR}
 
         stand.remove()
         return item
