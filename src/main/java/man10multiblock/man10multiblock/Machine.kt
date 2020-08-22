@@ -28,7 +28,7 @@ class Machine : Listener {
             val product = recipe.itemFromBase64(getData(machine,"product")?:return)!!
 
             p.inventory.addItem(product)
-            p.sendMessage("§a§l完成！")
+            p.sendMessage("§a§l製品が完成しました！")
             recipe.finishCraft(machine)
 
             return
@@ -64,6 +64,8 @@ class Machine : Listener {
 
         val p = e.whoClicked
         if (p !is Player)return
+
+        if (e.clickedInventory == p.inventory)return
 
         if (e.slot == 4)return
 

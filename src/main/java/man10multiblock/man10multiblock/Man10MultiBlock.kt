@@ -290,6 +290,8 @@ class Man10MultiBlock : JavaPlugin(),Listener{
     fun inventoryClickEvent(e:InventoryClickEvent){
         if (e.view.title != "MultiBlock")return
 
+        if (e.clickedInventory == e.whoClicked.inventory)return
+
         if (e.slot != 0 && e.slot != 8){
 
             e.isCancelled = true

@@ -38,9 +38,6 @@ class Recipe {
         setData(machine,"time",finish.time.time.toString())
         setData(machine,"product",itemToBase64(product))
 
-        Bukkit.getLogger().info(isFinish(machine).toString())
-        Bukkit.getLogger().info(isCraft(machine).toString())
-
         return finish
     }
 
