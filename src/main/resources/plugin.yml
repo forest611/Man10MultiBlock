@@ -4,7 +4,7 @@ softdepend:
   - Man10CommonLibs
   - Man10RealEstate
 main: man10multiblock.man10multiblock.Man10MultiBlock
-api-version: 1.16.2
+api-version: 1.16
 commands:
   multiblock:
     default: op
