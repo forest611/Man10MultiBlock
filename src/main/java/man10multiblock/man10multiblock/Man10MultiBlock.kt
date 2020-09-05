@@ -42,6 +42,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         }
 
         fun getData(item: ItemStack,key: String):String?{
+            if (!item.hasItemMeta())return null
             return item.itemMeta.persistentDataContainer[NamespacedKey(plugin,key), PersistentDataType.STRING]
         }
 
@@ -188,8 +189,6 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         val stand = getArmorStand(loc)?:return null
 
-        val block = stand.location.block.location
-
         val item = stand.getItem(EquipmentSlot.HEAD).clone()
 
         if (recipe.isCraft(item)){
@@ -198,15 +197,16 @@ class Man10MultiBlock : JavaPlugin(),Listener{
 
         if (!isMachine(item))return null
 
-        val cube = getCube(3,block)
+        stand.remove()
+
+        val cube = getCube(3, stand.location.block.location)
 
         cube.forEach{c -> c.block.type = Material.AIR}
 
-        stand.remove()
         return item
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler
     fun setMachineEvent(e:PlayerInteractEvent){
 
         if (!enableWorld.contains(e.player.location.world.name))return
@@ -238,7 +238,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         return
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler
     fun clickBarrier(e:PlayerInteractEvent){
 
         if (e.action != Action.RIGHT_CLICK_BLOCK)return
@@ -310,6 +310,8 @@ class Man10MultiBlock : JavaPlugin(),Listener{
         if (sender !is Player)return true
 
         if (!sender.hasPermission("man10multiblock.op"))return true
+
+        if (args.isEmpty())return true
 
         if (args[0] == "create"){
             val item = sender.inventory.itemInMainHand

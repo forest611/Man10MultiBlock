@@ -4,16 +4,12 @@ import man10multiblock.man10multiblock.Man10MultiBlock.Companion.getData
 import man10multiblock.man10multiblock.Man10MultiBlock.Companion.plugin
 import man10multiblock.man10multiblock.Man10MultiBlock.Companion.removeData
 import man10multiblock.man10multiblock.Man10MultiBlock.Companion.setData
-import org.bukkit.Bukkit
-import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Item
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.io.BukkitObjectInputStream
 import org.bukkit.util.io.BukkitObjectOutputStream
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -32,13 +28,13 @@ class Recipe {
 
         product.amount = material.amount
 
-        val finish = Calendar.getInstance()
-        finish.add(Calendar.MINUTE,(produceData.second*material.amount))
+        val time = Calendar.getInstance()
+        time.add(Calendar.MINUTE,(produceData.second*material.amount))
 
-        setData(machine,"time",finish.time.time.toString())
+        setData(machine,"time",time.time.time.toString())
         setData(machine,"product",itemToBase64(product))
 
-        return finish
+        return time
     }
 
     fun isFinish(machine: ItemStack):Boolean{

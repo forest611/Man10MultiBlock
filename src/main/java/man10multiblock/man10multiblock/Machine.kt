@@ -77,7 +77,13 @@ class Machine : Listener {
 
             val data = getData(e.inventory.getItem(9)?:return,"location")!!.split(";")
 
-            val machine = plugin.getMachine(Location(p.world,data[0].toDouble(),data[1].toDouble(),data[2].toDouble()))!!
+            val machine = plugin.getMachine(Location(p.world,data[0].toDouble(),data[1].toDouble(),data[2].toDouble()))
+
+            if (machine == null){
+                p.sendMessage("§c§l何者かによって、マシンを破壊されてしまったようだ")
+                p.closeInventory()
+                return
+            }
 
             val time = recipe.startCraft(machine,material)?:return
 
