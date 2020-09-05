@@ -54,7 +54,7 @@ class Man10MultiBlock : JavaPlugin(),Listener{
     }
 
     override fun onEnable() {
-        // Plugin startup logic
+
         saveDefaultConfig()
 
         plugin = this
